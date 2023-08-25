@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>位置情報取得&map表示</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <header>
+        <h1>位置情報取得&map表示</h1>
+    </header>
+
+    <div id="map"></div>
+    <div class="stage">
+        <canvas id="stage"></canvas>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script
+        src='https://www.bing.com/api/maps/mapcontrol?key=API Key'>
+    </script>
+
+    <script>
+
+        // マップ情報格納用の変数
+        let map;
+
+        // // ピンの定義
+        function pushPin(lat, lng, map) {
+            const location = new Microsoft.Maps.Location(lat, lng);
+            const pin = new Microsoft.Maps.Pushpin(location, {
+                color: "navy",
+                visible: true,
+            });
+            map.entities.push(pin);
+        }
+
+        // infoboxの定義
+        function generateInfobox(lat, lng, map) {
+            const location = new Microsoft.Maps.Location(lat, lng);
+            const infobox = new Microsoft.Maps.Infobox(location, {
+                title: `現在地`,
+                description: "",
+            });
+            infobox.setMap(map);
+        }
+
+
+        // 成功した時この後マップ表示の処理を書き込む
+        function mapsInit(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            map = new Microsoft.Maps.Map("#map", {
+                center: {
+                    latitude: lat,
+                    longitude: lng,
+                },
+                zoom: 15,
+            });
+            pushPin(lat, lng, map);
+            generateInfobox(lat, lng, map);
+
+    
+        }
+
+        //  失敗した時
+        function showError(error) {
+            const errorMessages = [
+                "位置情報が許可されてません",
+                "現在位置を特定できません",
+                "位置情報を取得する前にタイムアウトになりました",
+            ];
+            alert(`error:${errorMessages[error.code - 1]}`);
+        }
+
+        // オプション
+        const option = {
+            enableHighAccuracy: true,
+            maximumAge: 10000,
+            timeout: 10000,
+        };
+
+        window.onload = function () {
+            navigator.geolocation.getCurrentPosition(mapsInit, showError, option)
+
+        };
+
+
+
+
+
+
+    </script>
+
+</body>
+
+</html>

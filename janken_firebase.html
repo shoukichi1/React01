@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <header>
+        <h1>じゃんけんAPP</h1>
+    </header>
+
+    <main>
+        <ul id="btn">
+            <li id="gu_btn">グー</li>
+            <li id="cho_btn">チョキ</li>
+            <li id="par_btn">パー</li>
+        </ul>
+        <div id="com_hand">コンピュータの出した手は？</div>
+        <div id="result">結果は？</div>
+        <div id="total">現在の勝敗</div>
+    </main>
+
+    <footer>フッター</footer>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, query, getDocs } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-firestore.js";
+
+
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "API Key",
+            authDomain: "janken-app-8669a.firebaseapp.com",
+            projectId: "janken-app-8669a",
+            storageBucket: "janken-app-8669a.appspot.com",
+            messagingSenderId: "965314496377",
+            appId: "1:965314496377:web:07d725099f3a908ee4d1a8"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+
+        $("#gu_btn").on("click", function () {
+
+            const randomNumber1 = Math.floor(Math.random() * 3);
+            console.log(randomNumber1);
+
+            if (randomNumber1 === 0) {
+                $("#com_hand").text("グー")
+                $("#result").text("あいこ")
+            } else if (randomNumber1 === 1) {
+                $("#com_hand").text("チョキ")
+                $("#result").text("あなたの勝ち")
+            } else {
+                $("#com_hand").text("パー")
+                $("#result").text("あなたの負け")
+            }
+
+            const result = randomNumber1 === 0 ? "draw" : randomNumber1 === 1 ? "win" : "lose";
+
+            // Firebaseにデータを送る
+            addDoc(collection(db, "result"), {
+                result: result,
+                timestamp: serverTimestamp()
+            }).then(() => {
+                // エラー確認
+            }).catch((error) => {
+                console.error("Error adding document: ", error);
+            });
+
+            $("#result").text(result === "win" ? "あなたの勝ち" : result === "lose" ? "あなたの負け" : "あいこ");
+
+        });
+
+        $("#cho_btn").on("click", function () {
+
+            const randomNumber1 = Math.floor(Math.random() * 3);
+            console.log(randomNumber1);
+
+            if (randomNumber1 === 0) {
+                $("#com_hand").text("グー")
+                $("#result").text("あなたの負け")
+            } else if (randomNumber1 === 1) {
+                $("#com_hand").text("チョキ")
+                $("#result").text("あいこ")
+            } else {
+                $("#com_hand").text("パー")
+                $("#result").text("あなたの勝ち")
+            }
+
+            const result = randomNumber1 === 0 ? "draw" : randomNumber1 === 1 ? "win" : "lose";
+
+            // Firebaseにデータを送る
+            addDoc(collection(db, "result"), {
+                result: result,
+                timestamp: serverTimestamp()
+            }).then(() => {
+            // エラー確認
+            }).catch((error) => {
+                console.error("Error adding document: ", error);
+            });
+
+            $("#result").text(result === "win" ? "あなたの勝ち" : result === "lose" ? "あなたの負け" : "あいこ");
+
+        });
+
+        $("#par_btn").on("click", function () {
+
+            const randomNumber1 = Math.floor(Math.random() * 3);
+            console.log(randomNumber1);
+
+            if (randomNumber1 === 0) {
+                $("#com_hand").text("グー")
+                $("#result").text("あなたの勝ち")
+            } else if (randomNumber1 === 1) {
+                $("#com_hand").text("チョキ")
+                $("#result").text("あなたの負け")
+            } else {
+                $("#com_hand").text("パー")
+                $("#result").text("あいこ")
+            }
+
+            const result = randomNumber1 === 0 ? "draw" : randomNumber1 === 1 ? "win" : "lose";
+
+            // Firebaseにデータを送る
+            addDoc(collection(db, "result"), {
+                result: result,
+                timestamp: serverTimestamp()
+            }).then(() => {
+            // エラー確認
+            }).catch((error) => {
+                console.error("Error adding document: ", error);
+            });
+
+            $("#result").text(result === "win" ? "あなたの勝ち" : result === "lose" ? "あなたの負け" : "あいこ");
+
+
+        });
+
+        
+    function updateTotal() {
+        let winCount = 0;
+        let loseCount = 0;
+        let drawCount = 0;
+
+        // 全てのドキュメントを取得
+        getDocs(query(collection(db, "result"))).then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                if (data.result === "win") winCount++;
+                else if (data.result === "lose") loseCount++;
+                else drawCount++;
+            });
+
+            // 結果を表示
+            $('#total').text(`現在の勝敗: 勝ち ${winCount} 負け ${loseCount} あいこ ${drawCount}`);
+        }).catch((error) => {
+            console.error("Error getting documents: ", error);
+        });
+    }
+
+    // 初回ロード時に結果を表示
+    updateTotal();
+
+    </script>
+
+</body>
+
+</html>
